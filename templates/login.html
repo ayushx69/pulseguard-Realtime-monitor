@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PulseGuard | Admin Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Inter, Arial, sans-serif;
+            background: linear-gradient(180deg, #050b16, #07111f);
+            color: #edf5ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .box {
+            width: 100%;
+            max-width: 410px;
+            background: linear-gradient(180deg, #0d1728, #101d31);
+            border: 1px solid #223856;
+            border-radius: 24px;
+            padding: 30px;
+        }
+
+        .logo {
+            width: 54px;
+            height: 54px;
+            border-radius: 16px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, #4da3ff, #2563eb, #7c3aed);
+            font-size: 25px;
+            margin-bottom: 18px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 30px;
+        }
+
+        p {
+            margin: 8px 0 22px;
+            color: #91a7c2;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            background: #0b1626;
+            border: 1px solid #223856;
+            color: white;
+            padding: 14px;
+            border-radius: 14px;
+            outline: none;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        input:focus {
+            border-color: #4da3ff;
+        }
+
+        button {
+            width: 100%;
+            border: none;
+            border-radius: 14px;
+            padding: 14px;
+            background: linear-gradient(135deg, #2563eb, #4da3ff);
+            color: white;
+            font-weight: 900;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .error {
+            background: rgba(239,68,68,0.10);
+            color: #ffb2b2;
+            border: 1px solid rgba(239,68,68,0.28);
+            padding: 11px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+
+        .hint {
+            margin-top: 16px;
+            text-align: center;
+            color: #91a7c2;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box">
+        <div class="logo">⚡</div>
+
+        <h1>Admin Login</h1>
+        <p>Sign in to manage PulseGuard monitoring dashboard.</p>
+
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+
+        <form method="POST">
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
+
+        <div class="hint">Default login: admin / 1234</div>
+    </div>
+</body>
+</html>

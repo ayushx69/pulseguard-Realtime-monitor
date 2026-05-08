@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PulseGuard | Monitor History</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #07111f;
+            --panel: #0f1b2d;
+            --panel2: #132238;
+            --border: #223856;
+            --text: #edf5ff;
+            --muted: #91a7c2;
+            --blue: #4da3ff;
+            --green: #22c55e;
+            --red: #ef4444;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Inter, Arial, sans-serif;
+            background: linear-gradient(180deg, #050b16, #07111f);
+            color: var(--text);
+        }
+
+        .container {
+            width: 94%;
+            max-width: 1250px;
+            margin: auto;
+            padding: 26px 0 40px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 14px 16px;
+        }
+
+        .back {
+            color: #8fcbff;
+            text-decoration: none;
+            font-weight: 900;
+            background: rgba(77,163,255,0.10);
+            border: 1px solid rgba(77,163,255,0.28);
+            padding: 10px 14px;
+            border-radius: 999px;
+        }
+
+        .pill {
+            color: #cfe0f7;
+            background: #0b1626;
+            border: 1px solid var(--border);
+            padding: 10px 14px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .hero {
+            border: 1px solid var(--border);
+            background: linear-gradient(180deg, var(--panel), var(--panel2));
+            border-radius: 22px;
+            padding: 24px;
+            margin-bottom: 18px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .logo {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, #4da3ff, #2563eb);
+            font-size: 22px;
+        }
+
+        .brand-text h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .brand-text p {
+            margin: 3px 0 0;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .hero h1 {
+            margin: 0;
+            font-size: 34px;
+            line-height: 1.12;
+            letter-spacing: -0.8px;
+        }
+
+        .highlight {
+            background: linear-gradient(90deg, #68b6ff, #a78bfa, #34d399);
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .url {
+            color: var(--muted);
+            margin-top: 10px;
+            word-break: break-all;
+            font-size: 14px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .stat {
+            border: 1px solid var(--border);
+            background: linear-gradient(180deg, var(--panel), var(--panel2));
+            border-radius: 18px;
+            padding: 18px;
+        }
+
+        .stat p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .stat h3 {
+            margin: 10px 0 0;
+            font-size: 30px;
+            letter-spacing: -0.8px;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1.35fr 0.65fr;
+            gap: 16px;
+        }
+
+        .card {
+            border: 1px solid var(--border);
+            background: linear-gradient(180deg, var(--panel), var(--panel2));
+            border-radius: 20px;
+            padding: 20px;
+        }
+
+        .card h2 {
+            margin: 0 0 6px;
+            font-size: 21px;
+        }
+
+        .card-desc {
+            color: var(--muted);
+            margin: 0 0 16px;
+            font-size: 13px;
+        }
+
+        .chart-wrap {
+            height: 360px;
+        }
+
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            color: var(--muted);
+            font-size: 12px;
+            text-transform: uppercase;
+            background: #0b1626;
+        }
+
+        th, td {
+            padding: 13px;
+            border-bottom: 1px solid #1d314d;
+            text-align: left;
+        }
+
+        tr:hover {
+            background: #102038;
+        }
+
+        .status {
+            padding: 7px 11px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            display: inline-block;
+        }
+
+        .up {
+            background: rgba(34,197,94,0.10);
+            color: #8ff0b3;
+            border: 1px solid rgba(34,197,94,0.28);
+        }
+
+        .down {
+            background: rgba(239,68,68,0.10);
+            color: #ffb2b2;
+            border: 1px solid rgba(239,68,68,0.28);
+        }
+
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 430px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .event {
+            padding: 13px;
+            border-radius: 16px;
+            background: #0b1626;
+            border: 1px solid #1d314d;
+        }
+
+        .event-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .event-time {
+            margin-top: 8px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .event-response {
+            margin-top: 8px;
+            font-size: 14px;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 34px 18px;
+            color: var(--muted);
+            border: 1px dashed #294262;
+            border-radius: 18px;
+            background: #0b1626;
+        }
+
+        @media (max-width: 980px) {
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero h1 {
+                font-size: 29px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 13px;
+            }
+
+            .chart-wrap {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <div class="topbar">
+        <a class="back" href="/">← Back to Dashboard</a>
+        <div class="pill">Analytics Dashboard</div>
+    </div>
+
+    <div class="hero">
+        <div class="brand">
+            <div class="logo">📈</div>
+            <div class="brand-text">
+                <h2>PulseGuard Analytics</h2>
+                <p>Response time and uptime history</p>
+            </div>
+        </div>
+
+        <h1>History for <span class="highlight">{{ monitor[0] }}</span></h1>
+        <div class="url">{{ monitor[1] }}</div>
+    </div>
+
+    <div class="stats">
+        <div class="stat">
+            <p>Total Checks</p>
+            <h3>{{ logs|length }}</h3>
+        </div>
+
+        <div class="stat">
+            <p>UP Checks</p>
+            <h3>{{ logs|selectattr("0", "equalto", "UP")|list|length }}</h3>
+        </div>
+
+        <div class="stat">
+            <p>DOWN Checks</p>
+            <h3>{{ logs|selectattr("0", "equalto", "DOWN")|list|length }}</h3>
+        </div>
+
+        <div class="stat">
+            <p>Latest Response</p>
+            <h3>
+                {% if logs|length > 0 and logs[-1][1] > 0 %}
+                    {{ logs[-1][1] }} ms
+                {% else %}
+                    -
+                {% endif %}
+            </h3>
+        </div>
+    </div>
+
+    <div class="main-grid">
+        <div class="card">
+            <h2>Response Time Graph</h2>
+            <p class="card-desc">Last 30 checks plotted in chronological order.</p>
+
+            <div class="chart-wrap">
+                <canvas id="responseChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Recent Events</h2>
+            <p class="card-desc">Latest status checks.</p>
+
+            <div class="timeline">
+                {% for log in logs|reverse %}
+                <div class="event">
+                    <div class="event-top">
+                        <strong>Service Check</strong>
+                        <span class="status {% if log[0]=='UP' %}up{% else %}down{% endif %}">
+                            {{ log[0] }}
+                        </span>
+                    </div>
+
+                    <div class="event-response">
+                        Response:
+                        {% if log[1] > 0 %}
+                            {{ log[1] }} ms
+                        {% else %}
+                            -
+                        {% endif %}
+                    </div>
+
+                    <div class="event-time">{{ log[2] }}</div>
+                </div>
+                {% else %}
+                <div class="empty">
+                    No history logs yet. Wait for the next check cycle.
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+        <h2>Raw Check Logs</h2>
+        <p class="card-desc">Detailed monitoring log table.</p>
+
+        <table>
+            <tr>
+                <th>Status</th>
+                <th>Response Time</th>
+                <th>Checked At</th>
+            </tr>
+
+            {% for log in logs|reverse %}
+            <tr>
+                <td>
+                    <span class="status {% if log[0]=='UP' %}up{% else %}down{% endif %}">
+                        {{ log[0] }}
+                    </span>
+                </td>
+                <td>
+                    {% if log[1] > 0 %}
+                        {{ log[1] }} ms
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>{{ log[2] }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="3">No logs available yet.</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+</div>
+
+<script>
+    const labels = [
+        {% for log in logs %}
+            "{{ log[2] }}",
+        {% endfor %}
+    ];
+
+    const responseTimes = [
+        {% for log in logs %}
+            {{ log[1] }},
+        {% endfor %}
+    ];
+
+    const ctx = document.getElementById('responseChart');
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Response Time (ms)',
+                data: responseTimes,
+                borderColor: '#4da3ff',
+                backgroundColor: 'rgba(77, 163, 255, 0.10)',
+                pointBackgroundColor: '#22c55e',
+                pointBorderColor: '#ffffff',
+                pointRadius: 3,
+                pointHoverRadius: 6,
+                borderWidth: 2,
+                tension: 0.32,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: false,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#cfe0f7'
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        color: '#91a7c2',
+                        maxRotation: 45,
+                        minRotation: 0
+                    },
+                    grid: {
+                        color: 'rgba(145, 167, 194, 0.10)'
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: '#91a7c2'
+                    },
+                    grid: {
+                        color: 'rgba(145, 167, 194, 0.10)'
+                    }
+                }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

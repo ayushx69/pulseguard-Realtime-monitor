@@ -1,0 +1,47 @@
+version: "3.9"
+
+services:
+  uptime-monitor:
+    build: .
+    container_name: uptime-monitor
+    ports:
+      - "5000:5000"
+    environment:
+      - TELEGRAM_BOT_TOKEN="your_token_here"
+      - TELEGRAM_CHAT_ID=1116607240
+    depends_on:
+      - test-nginx
+    networks:
+      - monitor-net
+    restart: unless-stopped
+
+  test-nginx:
+    image: nginx:latest
+    container_name: test-nginx
+    ports:
+      - "8080:80"
+    networks:
+      - monitor-net
+    restart: unless-stopped
+
+  test-apache:
+    image: httpd:latest
+    container_name: test-apache
+    ports:
+      - "8081:80"
+    networks:
+      - monitor-net
+    restart: unless-stopped
+
+  test-redis:
+    image: redis:latest
+    container_name: test-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - monitor-net
+    restart: unless-stopped
+
+networks:
+  monitor-net:
+    driver: bridge
