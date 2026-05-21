@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PulseGuard | Premium Monitoring Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        * { box-sizing: border-box; }
+
+        :root {
+            --bg: #050b16;
+            --panel: #0d1728;
+            --panel2: #101d31;
+            --border: #223856;
+            --text: #edf5ff;
+            --muted: #91a7c2;
+            --blue: #4da3ff;
+            --green: #22c55e;
+            --red: #ef4444;
+            --yellow: #f59e0b;
+            --purple: #a855f7;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Inter, Arial, sans-serif;
+            background:
+                radial-gradient(circle at 10% 0%, rgba(77,163,255,0.14), transparent 28%),
+                radial-gradient(circle at 90% 0%, rgba(168,85,247,0.12), transparent 26%),
+                linear-gradient(180deg, #050b16, #07101f);
+            color: var(--text);
+        }
+
+        .container {
+            width: 94%;
+            max-width: 1350px;
+            margin: auto;
+            padding: 22px 0 40px;
+        }
+
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(5, 11, 22, 0.96);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 14px 18px;
+            margin-bottom: 18px;
+        }
+
+        .nav-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, #4da3ff, #2563eb, #7c3aed);
+            font-size: 22px;
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: 22px;
+            letter-spacing: -0.5px;
+        }
+
+        .brand p {
+            margin: 3px 0 0;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .nav-pill {
+            padding: 9px 13px;
+            border-radius: 999px;
+            background: #0b1626;
+            border: 1px solid var(--border);
+            color: #cfe0f7;
+            font-size: 12px;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .live {
+            color: #86efac;
+            background: rgba(34,197,94,0.09);
+            border-color: rgba(34,197,94,0.32);
+        }
+
+        .logout-btn {
+            color: #ffb2b2;
+            background: rgba(239,68,68,0.10);
+            border-color: rgba(239,68,68,0.28);
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: 1.35fr 0.65fr;
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+
+        .hero-main, .hero-side, .stat-card, .panel {
+            background: linear-gradient(180deg, var(--panel), var(--panel2));
+            border: 1px solid var(--border);
+            border-radius: 24px;
+        }
+
+        .hero-main {
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-main::after {
+            content: "";
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            right: -55px;
+            top: -55px;
+            background: radial-gradient(circle, rgba(77,163,255,0.20), transparent 65%);
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            gap: 8px;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(77,163,255,0.08);
+            border: 1px solid rgba(77,163,255,0.26);
+            color: #8fcbff;
+            font-size: 12px;
+            font-weight: 900;
+            margin-bottom: 18px;
+        }
+
+        .hero-main h2 {
+            margin: 0;
+            font-size: 44px;
+            line-height: 1.05;
+            letter-spacing: -1.3px;
+            max-width: 850px;
+        }
+
+        .gradient-text {
+            background: linear-gradient(90deg, #68b6ff, #a78bfa, #34d399);
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .hero-desc {
+            margin: 15px 0 0;
+            color: var(--muted);
+            line-height: 1.75;
+            font-size: 15px;
+            max-width: 780px;
+        }
+
+        .feature-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 9px;
+            margin-top: 20px;
+        }
+
+        .feature {
+            padding: 8px 11px;
+            border-radius: 999px;
+            background: #0b1626;
+            border: 1px solid var(--border);
+            color: #c8d8ec;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .hero-side {
+            padding: 24px;
+        }
+
+        .health-title {
+            color: #86efac;
+            font-size: 13px;
+            font-weight: 900;
+            margin-bottom: 12px;
+        }
+
+        .health-number {
+            font-size: 60px;
+            font-weight: 950;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .health-sub {
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .progress {
+            margin-top: 20px;
+            height: 12px;
+            border-radius: 999px;
+            background: #070f1c;
+            border: 1px solid #1b2e49;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #22c55e, #4da3ff);
+            transition: width 0.35s ease;
+        }
+
+        .mini-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .mini-box {
+            background: #0b1626;
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 13px;
+        }
+
+        .mini-box span {
+            display: block;
+            color: var(--muted);
+            font-size: 11px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .mini-box strong {
+            font-size: 14px;
+        }
+
+        .incident-banner {
+            background: linear-gradient(90deg, rgba(34,197,94,0.12), rgba(77,163,255,0.10));
+            border: 1px solid rgba(34,197,94,0.25);
+            border-radius: 20px;
+            padding: 14px 18px;
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        .incident-banner strong {
+            color: #b6ffd0;
+        }
+
+        .incident-banner span {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .stat-card {
+            padding: 18px;
+        }
+
+        .stat-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-label {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .stat-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            background: #0b1a2c;
+            font-size: 19px;
+        }
+
+        .stat-value {
+            font-size: 35px;
+            font-weight: 950;
+            margin-top: 14px;
+        }
+
+        .panel {
+            padding: 20px;
+        }
+
+        .panel-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .panel-head h3 {
+            margin: 0;
+            font-size: 28px;
+            letter-spacing: -0.7px;
+        }
+
+        .panel-head p {
+            margin: 5px 0 0;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        form {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1.5fr auto;
+            gap: 12px;
+            margin-bottom: 14px;
+            background: #0a1422;
+            border: 1px solid #1d314d;
+            border-radius: 18px;
+            padding: 14px;
+        }
+
+        input, select {
+            background: #0d1a2c;
+            border: 1px solid #263d5d;
+            color: white;
+            padding: 14px;
+            border-radius: 14px;
+            outline: none;
+            font-size: 14px;
+            width: 100%;
+        }
+
+        input::placeholder {
+            color: #7890ad;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--blue);
+        }
+
+        button {
+            border: none;
+            border-radius: 14px;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, #2563eb, #4da3ff);
+            color: white;
+            font-weight: 900;
+            cursor: pointer;
+        }
+
+        .tools {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        .search {
+            max-width: 280px;
+            padding: 11px 14px;
+            border-radius: 999px;
+        }
+
+        .filter-btn {
+            background: #0b1626;
+            border: 1px solid var(--border);
+            color: #cfe0f7;
+            padding: 10px 13px;
+            border-radius: 999px;
+            font-weight: 800;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .filter-btn.active {
+            background: rgba(77,163,255,0.10);
+            border-color: rgba(77,163,255,0.45);
+            color: #8fcbff;
+        }
+
+        .monitor-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+        }
+
+        .monitor-card {
+            background: linear-gradient(180deg, #101d31, #12243d);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 16px;
+            transition: border-color 0.15s ease, transform 0.15s ease;
+        }
+
+        .monitor-card:hover {
+            border-color: rgba(77,163,255,0.55);
+            transform: translateY(-2px);
+        }
+
+        .monitor-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .monitor-name {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 950;
+            letter-spacing: -0.5px;
+            max-width: 220px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .monitor-url {
+            margin: 7px 0 0;
+            color: var(--muted);
+            font-size: 12px;
+            word-break: break-word;
+            line-height: 1.45;
+        }
+
+        .status {
+            padding: 7px 11px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 950;
+            letter-spacing: 0.5px;
+            border: 1px solid transparent;
+            white-space: nowrap;
+        }
+
+        .up {
+            background: rgba(34,197,94,0.10);
+            color: #8ff0b3;
+            border-color: rgba(34,197,94,0.28);
+        }
+
+        .down {
+            background: rgba(239,68,68,0.10);
+            color: #ffb2b2;
+            border-color: rgba(239,68,68,0.28);
+        }
+
+        .unknown {
+            background: rgba(148,163,184,0.10);
+            color: #d1d9e8;
+            border-color: rgba(148,163,184,0.24);
+        }
+
+        .type-badge {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 950;
+            border: 1px solid transparent;
+        }
+
+        .type-http {
+            background: rgba(77,163,255,0.10);
+            color: #8fcbff;
+            border-color: rgba(77,163,255,0.30);
+        }
+
+        .type-ping {
+            background: rgba(168,85,247,0.10);
+            color: #d8b4fe;
+            border-color: rgba(168,85,247,0.30);
+        }
+
+        .type-tcp {
+            background: rgba(245,158,11,0.10);
+            color: #fcd34d;
+            border-color: rgba(245,158,11,0.30);
+        }
+
+        .metric-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 16px 0;
+        }
+
+        .metric {
+            background: #0b1626;
+            border: 1px solid #1d314d;
+            border-radius: 14px;
+            padding: 12px;
+        }
+
+        .metric span {
+            display: block;
+            color: var(--muted);
+            font-size: 11px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .metric strong {
+            font-size: 14px;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+
+        .status-line {
+            height: 8px;
+            border-radius: 999px;
+            background: #07101d;
+            border: 1px solid #1d314d;
+            overflow: hidden;
+            margin: 10px 0 16px;
+        }
+
+        .status-fill {
+            width: 100%;
+            height: 100%;
+        }
+
+        .status-fill.up {
+            background: linear-gradient(90deg, #22c55e, #70e59a);
+        }
+
+        .status-fill.down {
+            background: linear-gradient(90deg, #ef4444, #fb7185);
+        }
+
+        .status-fill.unknown {
+            background: linear-gradient(90deg, #64748b, #94a3b8);
+        }
+
+        .monitor-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-link {
+            flex: 1;
+            text-align: center;
+            padding: 11px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 900;
+        }
+
+        .history {
+            background: rgba(77,163,255,0.10);
+            color: #8fcbff;
+            border: 1px solid rgba(77,163,255,0.28);
+        }
+
+        .delete {
+            background: rgba(239,68,68,0.10);
+            color: #ffb2b2;
+            border: 1px solid rgba(239,68,68,0.26);
+        }
+
+        .empty {
+            grid-column: 1 / -1;
+            background: #0b1626;
+            border: 1px dashed #294262;
+            border-radius: 18px;
+            text-align: center;
+            padding: 44px 18px;
+            color: var(--muted);
+        }
+
+        @media (max-width: 1100px) {
+            .hero { grid-template-columns: 1fr; }
+            .monitor-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 900px) {
+            .stats { grid-template-columns: repeat(2, 1fr); }
+            form { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 650px) {
+            .stats { grid-template-columns: 1fr; }
+            .monitor-grid { grid-template-columns: 1fr; }
+            .metric-row { grid-template-columns: 1fr; }
+            .hero-main h2 { font-size: 33px; }
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <div class="navbar">
+        <div class="nav-inner">
+            <div class="brand">
+                <div class="logo">⚡</div>
+                <div>
+                    <h1>PulseGuard</h1>
+                    <p>Premium uptime, IP and TCP monitoring dashboard</p>
+                </div>
+            </div>
+
+            <div class="nav-actions">
+                <div class="nav-pill live">● Live System</div>
+                <div class="nav-pill">UI Fetch: 5s</div>
+                <div class="nav-pill">Backend: 60s</div>
+                <div class="nav-pill">Telegram Ready</div>
+                <a href="/status" class="nav-pill">Public Status</a>
+                <a href="/logout" class="nav-pill logout-btn">Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="hero">
+        <div class="hero-main">
+            <div class="eyebrow">● PRO MONITORING DASHBOARD</div>
+            <h2>Monitor your <span class="gradient-text">web apps, IP devices and TCP ports</span> from one place.</h2>
+            <p class="hero-desc">
+                Track websites, Docker containers, routers, computers, CCTV cameras and TCP services with live health status, uptime metrics and Telegram recovery alerts.
+            </p>
+
+            <div class="feature-row">
+                <span class="feature">HTTP/HTTPS</span>
+                <span class="feature">Ping/IP</span>
+                <span class="feature">TCP Port</span>
+                <span class="feature">Live UI</span>
+                <span class="feature">Telegram Alerts</span>
+            </div>
+        </div>
+
+        <div class="hero-side">
+            <div class="health-title">SYSTEM HEALTH</div>
+            <div class="health-number" id="heroTotal">0</div>
+            <div class="health-sub">active monitors configured</div>
+
+            <div class="progress">
+                <div class="progress-fill" id="healthFill"></div>
+            </div>
+
+            <div class="mini-info">
+                <div class="mini-box">
+                    <span>Mode</span>
+                    <strong>Docker</strong>
+                </div>
+                <div class="mini-box">
+                    <span>Alerts</span>
+                    <strong>Telegram</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="incident-banner">
+        <div>
+            <strong id="incidentTitle">All systems are being monitored</strong><br>
+            <span id="incidentText">Live status updates are running in the background without page refresh.</span>
+        </div>
+        <div class="nav-pill" id="lastUpdated">Loading...</div>
+    </div>
+
+    <div class="stats">
+        <div class="stat-card">
+            <div class="stat-head">
+                <div class="stat-label">Total Monitors</div>
+                <div class="stat-icon">🛰️</div>
+            </div>
+            <div class="stat-value" id="totalCount">0</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-head">
+                <div class="stat-label">Online</div>
+                <div class="stat-icon">✅</div>
+            </div>
+            <div class="stat-value" id="upCount">0</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-head">
+                <div class="stat-label">Down</div>
+                <div class="stat-icon">🚨</div>
+            </div>
+            <div class="stat-value" id="downCount">0</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-head">
+                <div class="stat-label">Unknown</div>
+                <div class="stat-icon">❔</div>
+            </div>
+            <div class="stat-value" id="unknownCount">0</div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-head">
+            <div>
+                <h3>Service Monitors</h3>
+                <p>Examples: http://test-nginx:80 | 192.168.1.1 | 192.168.1.20:22</p>
+            </div>
+        </div>
+
+        <form action="/add" method="POST">
+            <input type="text" name="name" placeholder="Service name e.g. Office Router" required>
+
+            <select name="monitor_type" required>
+                <option value="HTTP">HTTP/HTTPS</option>
+                <option value="PING">Ping/IP</option>
+                <option value="TCP">TCP Port</option>
+            </select>
+
+            <input type="text" name="url" placeholder="HTTP: http://site.com | Ping: 192.168.1.1 | TCP: 192.168.1.20:22" required>
+
+            <button type="submit">+ Add Monitor</button>
+        </form>
+
+        <div class="tools">
+            <input class="search" type="text" id="searchBox" placeholder="Search service...">
+            <button class="filter-btn active" data-filter="ALL">All</button>
+            <button class="filter-btn" data-filter="UP">UP</button>
+            <button class="filter-btn" data-filter="DOWN">DOWN</button>
+            <button class="filter-btn" data-filter="Unknown">Unknown</button>
+        </div>
+
+        <div class="monitor-grid" id="monitorGrid">
+            <div class="empty">
+                <h2>Loading monitors...</h2>
+                <p>Please wait.</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    let allMonitors = [];
+    let currentFilter = "ALL";
+
+    function escapeHtml(text) {
+        if (!text) return "";
+        return String(text)
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+    }
+
+    function statusClass(status) {
+        if (status === "UP") return "up";
+        if (status === "DOWN") return "down";
+        return "unknown";
+    }
+
+    function typeClass(type) {
+        if (type === "HTTP") return "type-http";
+        if (type === "PING") return "type-ping";
+        if (type === "TCP") return "type-tcp";
+        return "type-http";
+    }
+
+    function renderMonitors() {
+        const grid = document.getElementById("monitorGrid");
+        const searchValue = document.getElementById("searchBox").value.toLowerCase();
+
+        let filtered = allMonitors.filter(m => {
+            const matchesFilter = currentFilter === "ALL" || m.status === currentFilter;
+            const matchesSearch =
+                String(m.name).toLowerCase().includes(searchValue) ||
+                String(m.url).toLowerCase().includes(searchValue) ||
+                String(m.monitor_type).toLowerCase().includes(searchValue);
+
+            return matchesFilter && matchesSearch;
+        });
+
+        if (filtered.length === 0) {
+            grid.innerHTML = `
+                <div class="empty">
+                    <h2>No monitors found</h2>
+                    <p>Add a new monitor or change your filter.</p>
+                </div>
+            `;
+            return;
+        }
+
+        grid.innerHTML = filtered.map(m => {
+            const response = m.response_time > 0 ? `${m.response_time} ms` : "-";
+            const lastChecked = m.last_checked ? m.last_checked : "-";
+            const uptime = m.uptime ? `${m.uptime}%` : "0%";
+            const status = statusClass(m.status);
+            const type = typeClass(m.monitor_type);
+
+            return `
+                <div class="monitor-card">
+                    <div class="monitor-top">
+                        <div>
+                            <h3 class="monitor-name">${escapeHtml(m.name)}</h3>
+                            <p class="monitor-url">${escapeHtml(m.url)}</p>
+                            <span class="type-badge ${type}">${escapeHtml(m.monitor_type)}</span>
+                        </div>
+
+                        <span class="status ${status}">${escapeHtml(m.status)}</span>
+                    </div>
+
+                    <div class="metric-row">
+                        <div class="metric">
+                            <span>Response</span>
+                            <strong>${response}</strong>
+                        </div>
+
+                        <div class="metric">
+                            <span>Uptime</span>
+                            <strong>${uptime}</strong>
+                        </div>
+
+                        <div class="metric">
+                            <span>Last Check</span>
+                            <strong>${lastChecked}</strong>
+                        </div>
+                    </div>
+
+                    <div class="status-line">
+                        <div class="status-fill ${status}"></div>
+                    </div>
+
+                    <div class="monitor-actions">
+                        <a class="btn-link history" href="/history/${m.id}">View History</a>
+                        <a class="btn-link delete" href="/delete/${m.id}">Delete</a>
+                    </div>
+                </div>
+            `;
+        }).join("");
+    }
+
+    function updateStats(stats) {
+        document.getElementById("totalCount").innerText = stats.total;
+        document.getElementById("upCount").innerText = stats.up;
+        document.getElementById("downCount").innerText = stats.down;
+        document.getElementById("unknownCount").innerText = stats.unknown;
+        document.getElementById("heroTotal").innerText = stats.total;
+
+        let healthPercent = stats.total > 0 ? Math.round((stats.up / stats.total) * 100) : 0;
+        document.getElementById("healthFill").style.width = healthPercent + "%";
+
+        const incidentTitle = document.getElementById("incidentTitle");
+        const incidentText = document.getElementById("incidentText");
+
+        if (stats.down > 0) {
+            incidentTitle.innerText = "Incident detected";
+            incidentText.innerText = `${stats.down} service(s) currently DOWN. Telegram alert will trigger on status change.`;
+        } else if (stats.total === 0) {
+            incidentTitle.innerText = "No monitors configured";
+            incidentText.innerText = "Add HTTP, Ping or TCP monitor to start tracking services.";
+        } else {
+            incidentTitle.innerText = "All monitored services are operational";
+            incidentText.innerText = "Live status updates are running in the background without page refresh.";
+        }
+    }
+
+    async function fetchMonitors() {
+        try {
+            const response = await fetch("/api/monitors");
+
+            if (response.status === 401) {
+                window.location.href = "/login";
+                return;
+            }
+
+            const data = await response.json();
+
+            allMonitors = data.monitors || [];
+            updateStats(data.stats || {total: 0, up: 0, down: 0, unknown: 0});
+            renderMonitors();
+
+            const now = new Date();
+            document.getElementById("lastUpdated").innerText =
+                "Updated: " + now.toLocaleTimeString();
+
+        } catch (error) {
+            document.getElementById("lastUpdated").innerText = "Update failed";
+            console.error(error);
+        }
+    }
+
+    document.getElementById("searchBox").addEventListener("input", renderMonitors);
+
+    document.querySelectorAll(".filter-btn").forEach(btn => {
+        btn.addEventListener("click", function(e) {
+            e.preventDefault();
+
+            document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+            this.classList.add("active");
+
+            currentFilter = this.dataset.filter;
+            renderMonitors();
+        });
+    });
+
+    fetchMonitors();
+    setInterval(fetchMonitors, 5000);
+</script>
+
+</body>
+</html>
